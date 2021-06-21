@@ -1,31 +1,30 @@
-const http = require('http');
-const users = require('../src/user.ts');
+import http from "http";
+import addUser from "../src/user";
 
-const hostname = '127.0.0.1';
-const port = 4000;
-
+import { hostname, port } from "./config";
 
 const server = http.createServer((req, res) => {
-    if (req.method !== 'POST') {
-        res.statusCode = 403;
-        res.end();
-        return;
-    }
+  if (req.method !== "POST") {
+    res.statusCode = 403;
+    return res.end();
+  }
 
-    if (req.url === '/addUser') {
-        let body = [];
+  if (req.url === "/addUser") {
+    let body: Uint8Array[] = [];
 
-        req.on('data', chunk => {
-            body.push(chunk);
-        }).on('end', () => {
-            users.addUser(Buffer.concat(body).toString());
-        });
-        
-        res.statusCode = 200;
-        res.end('okay');
-    }
+    req
+      .on("data", (chunk) => {
+        body.push(chunk);
+      })
+      .on("end", () => {
+        addUser(Buffer.concat(body).toString());
+      });
+
+    res.statusCode = 200;
+    res.end("okay");
+  }
 });
 
 server.listen(port, hostname, () => {
-    console.log(`Server running at http://${hostname}:${port}`);
+  console.log(`Server running at http://${hostname}:${port}`);
 });
